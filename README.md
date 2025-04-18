@@ -14,7 +14,9 @@ Hébergez facilement votre propre instance Vaultwarden en local et automatisez v
 ## 📋 Prérequis  
 - Docker & Docker compose
 - GitLab RUnner installé en local
-- Gitlab (auto-hébérgé ou GitLab.com) 
+- Un serveur GitLab (auto-hébergé ou GitLab.com)
+
+---
 
 ## 🛠️ Guide complet : De 0 -> Coffre-fort Vaultwarden + Gitlab runner local + extraction de secret 
 ### 1. Installer Docker et Docker compose :  
@@ -63,9 +65,8 @@ http://localhost:8080
 ```bash
 docker exec -it vaultwarden /vaultwarden hash
 ```
-Entre un mot de passe que tu veux, une fois effectuée tu auras un 'ADMIN_TOKEN=' tu le copies.
-2. Modifier ton docker-compose.yml 
-Ajoute : 
+Saisis le mot de passe souhaité. Une fois généré, tu obtiens un ADMIN_TOKEN=. Copie-le.
+2. Modifie ton docker-compose.yml 
 ```yaml
 environment:
   WEBSOCKET_ENABLED: 'true'
@@ -77,26 +78,26 @@ docker-compose down
 docker-compose up -d
 ```
 ### 4. Configurer Vaultwarden (Web)
-- Créer ton premier utilisateru admin
-- Créer une organisation (ex : Entreprise)
-- Créer une collection (ex : CI & CD)
-- Ajoute un élement
-- Remplis comme suit :
-Nom : Clé SSH Déploiement CI
-Type : Secure Note (note sécurisée pour ceux qui ont 5/20 de moyenne en anglais)
-Note : Clé privée pour déploiement
--Maintenant ajoute un champ personnalisé :
-Nom : clé_ssh
-Valeur : Tu mets ta clé privée
+- Crée ton premier utilisateru admin
+- Crée une organisation (ex : Entreprise)
+- Crée une collection (ex : CI & CD)
+- Ajoute un élement :
+--  Nom : Clé SSH Déploiement CI
+--  Type : Secure Note (note sécurisée pour ceux qui ont 5/20 de moyenne en anglais)
+--  Note : Clé privée pour déploiement
+Puis ajoute un champ personnalisé :
+- Nom : clé_ssh
+- Valeur : Tu mets ta clé privée
 
-Tu n'as pas de clé privée ? Panique pas trql
+### 5. Générer une clé SSH pour GitLab CI
+Pas encore de clé privée ? Pas d'inquiétude, voici comment la créer : 
 ```bash
 ssh-keygen -t ed25519 -C "clé déploiement GitLab CI"
 ```
-Quand il te demande : 
-"Enter file in wich to save the key" tu réponds avec : /root/.ssh/id_gitlab_ci
+Lorsqu'il te demande : 
+"Enter file in wich to save the key" tapes : /root/.ssh/id_gitlab_ci
 "Enter passphrase" : Laisse vide (appuie 2 fois sur entrée)
-Pour lire ta clé : 
+Pour afficher ta clé : 
 ```bash
 cat /root/.ssh/id_gitlab_ci
 ```
@@ -108,13 +109,13 @@ Ca t'afficheras :
 ```
 TU COPIES TOUT LE CONTENU
 
-### 5. Installer GitLab Runner en local 
+### 6. Installer GitLab Runner en local 
 ```bash
 curl -L --output /usr/local/bin/gitlab-runner https://gitlab-runner-downloads.s3.amazonaws.com/latest/binaries/gitlab-runner-linux-amd64
 chmod +x /usr/local/bin/gitlab-runner
 gitlab-runner --version
 ````
-### 6. Créer ton projet CI local 
+### 7. Créer ton projet CI local 
 # 1. Reviens dans /root : 
 ```bash
 cd ..
@@ -125,10 +126,13 @@ mkdir -p vaultwarden/vault-ci-local
 cd vaultwarden/vault-ci-local
 git init
 ```
-Retourne sur ton 'localhost:8080'
-Dans l'admin console en bas à gauche, clique sur 'membres' puis 'inviter un membre' en haut a droite, dans courriel : ci-bot@entreprise.local (en vrai tu mets ce que tu veux)
-Tu sauvegardes, tu te déconnectes, puis tu crées un compte avec l'email que tu viens de rentrer, une fois le compte créer, tu retournes sur ton compte admin et dans sa console. Tu confirmes l'invitation de l'invité, puis tu lui accordes les accès à la collection "CI & CD"
-# 3. Créer ton .gitlab-ci.yml
+# 3. Configure Vaultwarden pour CI :
+- Sur http://localhost:8080, connecte-toi à l'admin console.
+- Invite un nouveau membre :
+-   Email : ci-bot@entreprise.local (ou ce que tu veux)
+- Crée le compte pour cet utilisateur invité.
+- En tant qu'admin, accepte l'invitation et donne-lui accès à la collection "CI & CD".
+# 4. Crée ton .gitlab-ci.yml
 ```bash
 nano .gitlab-ci.yml
 ```
@@ -147,27 +151,25 @@ test_vaultwarden:
     - chmod +x /usr/local/bin/bw
     - bw logout || true
     - bw config server http://localhost:8080
-    - echo "🔓 Unlocking vault directly..."
+    - echo "Unlocking vault directly..."
     - SESSION=$(bw login "TON_EMAIL_DE_LUSER" "TON_MOT_DE_PASSE" --raw)
-    - echo "-----🔑 Clé récupérée depuis Vaultwarden :-----"
+    - echo "-----Clé récupérée depuis Vaultwarden :-----"
     - bw get item "LID_DE_LA_CLE_SSH" --session "$SESSION" | jq -r '.fields[] | select(.name=="clé_ssh") | .value'
 ```
-# 4 Installation de 'jq' & 'bw'
+### 8. Installation de 'jq' & 'bw'
 ```bash
 apt update
-apt install -y jq
-```
-```
-apt update
-apt install -y unzip
-```
-```
+apt install -y jq unzip
 curl -sL 'https://vault.bitwarden.com/download/?app=cli&platform=linux' -o bw.zip
 unzip bw.zip
 mv bw /usr/local/bin/bw
 chmod +x /usr/local/bin/bw
 ```
 ```
+apt update
+apt install -y unzip
+```
+```
 unzip bw.zip
 ```
 ```
@@ -176,45 +178,48 @@ mv bw /usr/local/bin/bw
 ```
 chmod +x /usr/local/bin/bw
 ```
-# 5.Configurer le serveur + récuperer l'id de sa clée SSH de Vaultwarden
-1. Configuration du serveur au local :
+### 9.Configurer le serveur + récuperer l'id de sa clée SSH de Vaultwarden
+# 1. Définir l'URL du serveur : 
 ```
 bw config server http://localhost:8080
 ```
-2. Configuration de ton email + mdp :
+# 2. Connexion au compte : 
 ```
 bw login "TON_EMAIL_DE_LUSER" "TON_MOT_DE_PASSE"
 ```
-3. Récuperer l'id de la clé SSH :
+# 3. Récuperer l'id de l'élément :
 ```
 export BW_SESSION=$(bw unlock --raw)
 bw list items --session "$BW_SESSION" | jq -r '.[] | "\(.name) => \(.id)"'
 ```
-Tu devrais avoir en résultat :
+Tu obtiens :
 ```
 ? Master password: [hidden]
 Clé SSH Déploiement CI => L_ID_DE_TA_CLE_SSH
 ```
-Dès à présent tu copies l'id et tu modifies ton fichier .gitlab-ci.yml
+Copie cet ID et mets-le dans ton .gitlab-ci.yml
 
-Malheuresement il te sera impossible d'éxecuter le script car tu es sur la version 17.x GitLab runner ! 
-# 6. Installer Gitlab Runner 15.x
-1. Supprimer l'acuel Gitlab runner 17.x et installe gitlab runner 15.11.0
+### 10. Installer Gitlab Runner 15.x (si problème)
+Si tu es sur GitLab Runner 17.x, il peut y avoir des incompatibilités. Installe GitLab Runner 15.11.0 :
 ```bash
 apt remove --purge -y gitlab-runner
 curl -L --output /usr/local/bin/gitlab-runner https://gitlab-runner-downloads.s3.amazonaws.com/v15.11.0/binaries/gitlab-runner-linux-amd64
 chmod +x /usr/local/bin/gitlab-runner
 gitlab-runner --version
 ```
-# 7. Ajoute ton .gitlab-ci.yml dans Git
+### 11. Lancer ton job GitLab Runner
+Ajoute ton fichier .gitlab-ci.yml :
 ```bash
 git add .gitlab-ci.yml
 git commit -m "Initial commit - Setup Vaultwarden CI"
 ```
-#8. Exécute ton job et admire le résultat : 
+Puis exécute : 
 ```bash
 gitlab-runner exec shell test_vaultwarden
 ``` 
+Admire le résultat !
+
+---
 
 ## 📢 Assistance
 
