@@ -82,9 +82,9 @@ docker-compose up -d
 - Crée une organisation (ex : Entreprise)
 - Crée une collection (ex : CI & CD)
 - Ajoute un élement :
---  Nom : Clé SSH Déploiement CI
---  Type : Secure Note (note sécurisée pour ceux qui ont 5/20 de moyenne en anglais)
---  Note : Clé privée pour déploiement
+- Nom : Clé SSH Déploiement CI
+- Type : Secure Note (note sécurisée pour ceux qui ont 5/20 de moyenne en anglais)
+- Note : Clé privée pour déploiement
 Puis ajoute un champ personnalisé :
 - Nom : clé_ssh
 - Valeur : Tu mets ta clé privée
@@ -95,8 +95,8 @@ Pas encore de clé privée ? Pas d'inquiétude, voici comment la créer :
 ssh-keygen -t ed25519 -C "clé déploiement GitLab CI"
 ```
 Lorsqu'il te demande : 
-"Enter file in wich to save the key" tapes : /root/.ssh/id_gitlab_ci
-"Enter passphrase" : Laisse vide (appuie 2 fois sur entrée)
+- "Enter file in wich to save the key" tapes : /root/.ssh/id_gitlab_ci
+- "Enter passphrase" : Laisse vide (appuie 2 fois sur entrée)
 Pour afficher ta clé : 
 ```bash
 cat /root/.ssh/id_gitlab_ci
