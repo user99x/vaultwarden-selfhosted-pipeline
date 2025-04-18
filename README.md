@@ -218,6 +218,10 @@ Puis exécute :
 gitlab-runner exec shell test_vaultwarden
 ``` 
 Admire le résultat !
+### Bonus : Si tu souhaites synchroniser ton bw avec vaultwarden suite à un changement (nouveau élement)
+```bash
+bw sync --session "$BW_SESSION"
+```
 
 ---
 
