@@ -116,23 +116,23 @@ chmod +x /usr/local/bin/gitlab-runner
 gitlab-runner --version
 ````
 ### 7. Créer ton projet CI local 
-# 1. Reviens dans /root : 
+1. Reviens dans /root : 
 ```bash
 cd ..
 ```
-# 2. Crée le dossier propre et rentre dedans et initalise ton dépôt Git : 
+2. Crée le dossier propre et rentre dedans et initalise ton dépôt Git : 
 ```bash
 mkdir -p vaultwarden/vault-ci-local
 cd vaultwarden/vault-ci-local
 git init
 ```
-# 3. Configure Vaultwarden pour CI :
+3. Configure Vaultwarden pour CI :
 - Sur http://localhost:8080, connecte-toi à l'admin console.
 - Invite un nouveau membre :
 -   Email : ci-bot@entreprise.local (ou ce que tu veux)
 - Crée le compte pour cet utilisateur invité.
 - En tant qu'admin, accepte l'invitation et donne-lui accès à la collection "CI & CD".
-# 4. Crée ton .gitlab-ci.yml
+4. Crée ton .gitlab-ci.yml
 ```bash
 nano .gitlab-ci.yml
 ```
@@ -179,15 +179,15 @@ mv bw /usr/local/bin/bw
 chmod +x /usr/local/bin/bw
 ```
 ### 9.Configurer le serveur + récuperer l'id de sa clée SSH de Vaultwarden
-# 1. Définir l'URL du serveur : 
+1. Définir l'URL du serveur : 
 ```
 bw config server http://localhost:8080
 ```
-# 2. Connexion au compte : 
+2. Connexion au compte : 
 ```
 bw login "TON_EMAIL_DE_LUSER" "TON_MOT_DE_PASSE"
 ```
-# 3. Récuperer l'id de l'élément :
+3. Récuperer l'id de l'élément :
 ```
 export BW_SESSION=$(bw unlock --raw)
 bw list items --session "$BW_SESSION" | jq -r '.[] | "\(.name) => \(.id)"'
