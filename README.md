@@ -5,11 +5,11 @@ Hébergez facilement votre propre instance Vaultwarden en local et automatisez v
 ![Security](https://img.shields.io/badge/security-High-red.svg)  
 
 ## 🛡️ Fonctionnalités de Sécurité & Déploiement
-✔️ **Hébergement local sécurisé de Vaultwarden** (HTTPS, sauvegardes)
-✔️ **Automatisation CI/CD** avec GitLab Runner local
-✔️ **Déploiement rapide** via Docker et Docker Compose
-✔️ **Gestion simple** des mises à jour et des backups
-✔️ **Projet 100% auto-hébergé**, sans dépendance à des services externes
+- ✔️ **Hébergement local sécurisé de Vaultwarden** (HTTPS, sauvegardes)
+- ✔️ **Automatisation CI/CD** avec GitLab Runner local
+- ✔️ **Déploiement rapide** via Docker et Docker Compose
+- ✔️ **Gestion simple** des mises à jour et des backups
+- ✔️ **Projet 100% auto-hébergé**, sans dépendance à des services externes
 
 ## 📋 Prérequis  
 - Docker & Docker compose
