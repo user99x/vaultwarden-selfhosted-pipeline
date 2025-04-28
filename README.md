@@ -66,6 +66,7 @@ http://localhost:8080
 docker exec -it vaultwarden /vaultwarden hash
 ```
 Saisis le mot de passe souhaité. Une fois généré, tu obtiens un ADMIN_TOKEN=. Copie-le.
+
 2. Modifie ton docker-compose.yml 
 ```yaml
 environment:
