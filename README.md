@@ -98,6 +98,7 @@ ssh-keygen -t ed25519 -C "clé déploiement GitLab CI"
 Lorsqu'il te demande : 
 - "Enter file in wich to save the key" tapes : /root/.ssh/id_gitlab_ci
 - "Enter passphrase" : Laisse vide (appuie 2 fois sur entrée)
+  
 Pour afficher ta clé : 
 ```bash
 cat /root/.ssh/id_gitlab_ci
